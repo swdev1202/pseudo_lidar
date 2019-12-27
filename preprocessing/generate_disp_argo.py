@@ -47,7 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('--train_size', type=int, default=4)
     args = parser.parse_args()
 
-    for i in range(NUM_TRAIN+1):
+    for i in range(1, args.train_size+1)
         train_dir = args.data_path + 'train' + str(i) + '/'
         print('Currently Processing Train ', str(i))
 
