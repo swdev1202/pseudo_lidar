@@ -22,7 +22,7 @@ def generate_disparity_from_velo_argo(pc_path, scene_log):
     # uv => nx3 points in image coord + depth
     uv = calib.project_ego_to_image(pc) # 3D point cloud -> 2d pixel coordinates
     print(uv.shape)
-    
+
     fov_inds = (uv[:, 0] < STEREO_IMG_WIDTH - 1) & (uv[:, 0] >= 0) & \
                (uv[:, 1] < STEREO_IMG_HEIGHT - 1) & (uv[:, 1] >= 0)
     fov_inds = fov_inds & (pc[:, 0] > 2)
@@ -76,4 +76,8 @@ if __name__ == '__main__':
 
             for fn in lidar_files_list:
                 lidar_file_path = lidar_dir + fn
+                lidar_file_name = fn.split('.')[0]
                 grnd_truth_disp = generate_disparity_from_velo_argo(lidar_file_path, curr_log)
+                np.save(disp_dir + lidar_file_name, grnd_truth_disp)
+                np.savetxt(disp_dir + lidar_file_name + '.out', grnd_truth_disp)
+    print("complete!")
