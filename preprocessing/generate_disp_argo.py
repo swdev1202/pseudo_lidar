@@ -28,16 +28,17 @@ def generate_disparity_from_velo_argo(pc_path, scene_log):
     fov_inds = fov_inds & (pc[:, 0] > 2)
     
     imgfov_pc_velo = pc[fov_inds, :]
-    imgfov_pc_rect = calib.project_ego_to_cam(imgfov_pc_velo)
+    # imgfov_pc_rect = calib.project_ego_to_cam(imgfov_pc_velo)
     imgfov_pts_2d = uv[fov_inds, :]
-    depth_map = np.zeros((STEREO_IMG_HEIGHT, STEREO_IMG_WIDTH)).astype(int)
+    depth_map = np.zeros((STEREO_IMG_HEIGHT, STEREO_IMG_WIDTH)).astype(int) - 1
     imgfov_pts_2d = np.round(imgfov_pts_2d).astype(int)
     print(imgfov_pts_2d.shape)
     for i in range(imgfov_pts_2d.shape[0]):
-        depth = imgfov_pc_rect[i, 2]
-        depth_map[int(imgfov_pts_2d[i, 1]), int(imgfov_pts_2d[i, 0])] = depth
+        # depth = imgfov_pc_rect[i, 2]
+        depth_map[int(imgfov_pts_2d[i, 1]), int(imgfov_pts_2d[i, 0])] = imgfov_pts_2d[i,2]
     
     disp_map = (calib.fu * BASELINE) / depth_map
+    disp_map[disp_map < 0] = -1.0
     return disp_map
 
 
