@@ -10,7 +10,7 @@ from argoverse.utils.camera_stats import get_image_dims_for_camera as get_dim
 
 # Argoverse Dataset Specific
 NUM_TRAIN = 4
-BASELINE = 0.2986 #page 4 of the paper (https://arxiv.org/pdf/1911.02620.pdf)
+BASELINE = 0.2986 # page 4 of the paper (https://arxiv.org/pdf/1911.02620.pdf) - horizontal offset
 STEREO_IMG_WIDTH = 2464
 STEREO_IMG_HEIGHT = 2056
 LEFT_STEREO_CAM = 'stereo_front_left'
@@ -19,7 +19,31 @@ def generate_disparity_from_velo_argo(pc_path, scene_log):
     pc = load_ply(pc_path) # load point cloud
     calib = scene_log.get_calibration(LEFT_STEREO_CAM) # load calibration
 
-    # uv => nx3 points in image coord + depth
+    # uv => nx3 points : {image coord + depth}
+    uv = calib.project_ego_to_image(pc) # 3D point cloud -> 2d pixel coordinates
+    print(uv.shape)
+
+    fov_inds = (uv[:, 0] < STEREO_IMG_WIDTH - 1) & (uv[:, 0] >= 0) & \
+               (uv[:, 1] < STEREO_IMG_HEIGHT - 1) & (uv[:, 1] >= 0)
+    fov_inds = fov_inds & (pc[:, 0] > 2)
+    
+    imgfov_pts_2d = uv[fov_inds, :] # only take out the relevant points that are inside image boundary
+    imgfov_pts_2d = np.round(imgfov_pts_2d).astype(int)
+    
+    depth_map = np.zeros((STEREO_IMG_HEIGHT, STEREO_IMG_WIDTH)).astype(int) - 1
+    print(imgfov_pts_2d.shape)
+    for i in range(imgfov_pts_2d.shape[0]):
+        depth_map[int(imgfov_pts_2d[i, 1]), int(imgfov_pts_2d[i, 0])] = imgfov_pts_2d[i,2]
+    
+    disp_map = (calib.fu * BASELINE) / depth_map
+    disp_map[disp_map < 0] = -1.0
+    return disp_map
+
+def generate_disparity_from_velo_argo_test(pc_path, scene_log):
+    pc = load_ply(pc_path) # load point cloud
+    calib = scene_log.get_calibration(LEFT_STEREO_CAM) # load calibration
+
+    # uv => nx3 points : {image coord + depth}
     uv = calib.project_ego_to_image(pc) # 3D point cloud -> 2d pixel coordinates
     print(uv.shape)
 
@@ -28,19 +52,20 @@ def generate_disparity_from_velo_argo(pc_path, scene_log):
     fov_inds = fov_inds & (pc[:, 0] > 2)
     
     imgfov_pc_velo = pc[fov_inds, :]
-    # imgfov_pc_rect = calib.project_ego_to_cam(imgfov_pc_velo)
-    imgfov_pts_2d = uv[fov_inds, :]
-    depth_map = np.zeros((STEREO_IMG_HEIGHT, STEREO_IMG_WIDTH)).astype(int) - 1
+    imgfov_pc_rect = calib.project_ego_to_cam(imgfov_pc_velo)
+    
+    imgfov_pts_2d = uv[fov_inds, :] # only take out the relevant points that are inside image boundary
     imgfov_pts_2d = np.round(imgfov_pts_2d).astype(int)
+    
+    depth_map = np.zeros((STEREO_IMG_HEIGHT, STEREO_IMG_WIDTH)).astype(int) - 1
     print(imgfov_pts_2d.shape)
     for i in range(imgfov_pts_2d.shape[0]):
-        # depth = imgfov_pc_rect[i, 2]
-        depth_map[int(imgfov_pts_2d[i, 1]), int(imgfov_pts_2d[i, 0])] = imgfov_pts_2d[i,2]
+        depth = imgfov_pc_rect[i, 2]
+        depth_map[int(imgfov_pts_2d[i, 1]), int(imgfov_pts_2d[i, 0])] = depth
     
     disp_map = (calib.fu * BASELINE) / depth_map
     disp_map[disp_map < 0] = -1.0
     return disp_map
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Disparity for Argoverse Dataset')
@@ -79,6 +104,14 @@ if __name__ == '__main__':
                 lidar_file_path = lidar_dir + fn
                 lidar_file_name = fn.split('.')[0]
                 grnd_truth_disp = generate_disparity_from_velo_argo(lidar_file_path, curr_log)
+                print("Ground Truth Disparity Map Shape = ", grnd_truth_disp.shape)
                 np.save(disp_dir + lidar_file_name, grnd_truth_disp)
-                np.savetxt(disp_dir + lidar_file_name + '.out', grnd_truth_disp)
-    print("complete!")
+                
+                # test code
+                disp_test = generate_disparity_from_velo_argo_test(lidar_file_path, curr_log)
+                print("Ground Truth Disparity Map (Test) Shape = ", disp_test.shape)
+                print("Compare both maps result = ", np.array_equal(grnd_truth_disp, disp_test))
+            
+            print(log_id, "finished")
+        print('train' + str(i) + ' finished')
+    print('disparity map generation completed')
