@@ -31,7 +31,7 @@ def generate_disparity_from_velo_argo(pc_path, scene_log):
     imgfov_pc_rect = calib.project_ego_to_cam(imgfov_pc_velo)
     imgfov_pts_2d = uv[fov_inds, :]
     depth_map = np.zeros((STEREO_IMG_HEIGHT, STEREO_IMG_WIDTH)).astype(int)
-    imgfov_pts_2d = np.round(imgfov_pts_2d).astpye(int)
+    imgfov_pts_2d = np.round(imgfov_pts_2d).astype(int)
     print(imgfov_pts_2d.shape)
     for i in range(imgfov_pts_2d.shape[0]):
         depth = imgfov_pc_rect[i, 2]
