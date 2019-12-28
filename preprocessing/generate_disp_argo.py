@@ -110,6 +110,8 @@ if __name__ == '__main__':
                 # test code
                 disp_test = generate_disparity_from_velo_argo_test(lidar_file_path, curr_log)
                 print("Ground Truth Disparity Map (Test) Shape = ", disp_test.shape)
+                np.save(disp_dir + lidar_file_name + '_test', disp_test)
+                
                 print("Compare both maps result = ", np.array_equal(grnd_truth_disp, disp_test))
             
             print(log_id, "finished")
