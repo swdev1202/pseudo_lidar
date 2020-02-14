@@ -17,11 +17,12 @@ LEFT_STEREO_CAM = 'stereo_front_left'
 
 def generate_disparity_from_velo_argo(pc_path, scene_log):
     pc = load_ply(pc_path) # load point cloud
+    print('point cloud shape = ', pc.shape)
     calib = scene_log.get_calibration(LEFT_STEREO_CAM) # load calibration
 
     # uv => nx3 points : {image coord + depth}
     uv = calib.project_ego_to_image(pc) # 3D point cloud -> 2d pixel coordinates
-    print(uv.shape)
+    print('converted uv shape = ', uv.shape)
 
     fov_inds = (uv[:, 0] < STEREO_IMG_WIDTH - 1) & (uv[:, 0] >= 0) & \
                (uv[:, 1] < STEREO_IMG_HEIGHT - 1) & (uv[:, 1] >= 0)

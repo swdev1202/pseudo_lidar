@@ -7,7 +7,7 @@ import scipy.misc as ssc
 import kitti_util
 
 
-def generate_dispariy_from_velo(pc_velo, height, width, calib):
+def generate_dispariy_from_velo(pc_velo, height, width, calib, cam_baseline):
     pts_2d = calib.project_velo_to_image(pc_velo)
     fov_inds = (pts_2d[:, 0] < width - 1) & (pts_2d[:, 0] >= 0) & \
                (pts_2d[:, 1] < height - 1) & (pts_2d[:, 1] >= 0)
@@ -20,7 +20,7 @@ def generate_dispariy_from_velo(pc_velo, height, width, calib):
     for i in range(imgfov_pts_2d.shape[0]):
         depth = imgfov_pc_rect[i, 2]
         depth_map[int(imgfov_pts_2d[i, 1]), int(imgfov_pts_2d[i, 0])] = depth
-    baseline = 0.54
+    baseline = cam_baseline
 
     disp_map = (calib.f_u * baseline) / depth_map
     return disp_map
@@ -30,6 +30,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Disparity')
     parser.add_argument('--data_path', type=str, default='~/Kitti/object/training/')
     parser.add_argument('--split_file', type=str, default='~/Kitti/object/train.txt')
+    parser.add_argument('--dataset', type=str, default='KITTI')
     args = parser.parse_args()
 
     assert os.path.isdir(args.data_path)
@@ -63,6 +64,12 @@ if __name__ == '__main__':
         image_file = '{}/{}.png'.format(image_dir, predix)
         image = ssc.imread(image_file)
         height, width = image.shape[:2]
-        disp = generate_dispariy_from_velo(lidar, height, width, calib)
+
+        if(args.dataset == 'KITTI'):
+            baseline = 0.54
+        else:
+            baseline = 0.2986
+            
+        disp = generate_dispariy_from_velo(lidar, height, width, calib, baseline)
         np.save(disparity_dir + '/' + predix, disp)
         print('Finish Disparity {}'.format(predix))

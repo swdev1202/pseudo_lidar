@@ -15,10 +15,12 @@ class Calibration(object):
         Points in <lidar>.bin are in Velodyne coord.
 
         y_image2 = P^2_rect * x_rect
-        y_image2 = P^2_rect * R0_rect * Tr_velo_to_cam * x_velo
-        x_ref = Tr_velo_to_cam * x_velo
         x_rect = R0_rect * x_ref
+        x_ref = Tr_velo_to_cam * x_velo
 
+        therefore,
+        y_image2 = P^2_rect * R0_rect * Tr_velo_to_cam * x_velo
+        
         P^2_rect = [f^2_u,  0,      c^2_u,  -f^2_u b^2_x;
                     0,      f^2_v,  c^2_v,  -f^2_v b^2_y;
                     0,      0,      1,      0]

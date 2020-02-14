@@ -37,8 +37,8 @@ parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--lr_scale', type=int, default=200, metavar='S',
-                    help='random seed (default: 1)')
+parser.add_argument('--lr_scale', type=int, default=200,
+                    help='# of epochs before changing learning rate')
 parser.add_argument('--split_file', default='Kitti/object/train.txt',
                     help='save model')
 parser.add_argument('--btrain', type=int, default=4)
