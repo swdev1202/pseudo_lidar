@@ -169,6 +169,7 @@ def main():
             loss = train(imgL_crop, imgR_crop, disp_crop_L)
             print('Iter %d training loss = %.3f , time = %.2f' % (batch_idx, loss, time.time() - start_time))
             total_train_loss += loss
+        log.info('epoch %d total training loss = %.3f' % (epoch, total_train_loss / len(TrainImgLoader)))
         print('epoch %d total training loss = %.3f' % (epoch, total_train_loss / len(TrainImgLoader)))
 
         # SAVE
