@@ -108,3 +108,6 @@ KITTI/
 
 # Jupyter
 *.ipynb
+
+# Models
+*.tar
