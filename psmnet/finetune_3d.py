@@ -43,6 +43,7 @@ parser.add_argument('--split_file', default='Kitti/object/train.txt',
                     help='save model')
 parser.add_argument('--btrain', type=int, default=4)
 parser.add_argument('--start_epoch', type=int, default=1)
+parser.add_argument('--num_worker', type=int, default=14)
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -60,7 +61,7 @@ all_left_img, all_right_img, all_left_disp, = ls.dataloader(args.datapath,
 
 TrainImgLoader = torch.utils.data.DataLoader(
     DA.myImageFloder(all_left_img, all_right_img, all_left_disp, True),
-    batch_size=args.btrain, shuffle=True, num_workers=14, drop_last=False)
+    batch_size=args.btrain, shuffle=True, num_workers=args.num_worker, drop_last=False)
 
 if args.model == 'stackhourglass':
     model = stackhourglass(args.maxdisp)
