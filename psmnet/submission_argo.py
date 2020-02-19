@@ -2,17 +2,20 @@ from __future__ import print_function
 import argparse
 import os
 import random
+
 import torch
 import torch.nn as nn
 import torch.nn.parallel
-import torch.backends.cudnn as cudnn
+import torch. ckends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data
 from torch.autograd import Variable
 import torch.nn.functional as F
+
 import skimage
 import skimage.io
 import skimage.transform
+
 import numpy as np
 import time
 import math
@@ -25,7 +28,7 @@ parser = argparse.ArgumentParser(description='PSMNet')
 parser.add_argument('--KITTI', default='2015',
                     help='KITTI version')
 parser.add_argument('--datapath', default='/scratch/datasets/kitti2015/testing/',
-                    help='select model')
+                    help='select data')
 parser.add_argument('--loadmodel', default=None,
                     help='loading model')
 parser.add_argument('--model', default='stackhourglass',
@@ -74,10 +77,15 @@ def test(imgL,imgR):
         model.eval()
 
         if args.cuda:
-           imgL = torch.FloatTensor(imgL).cuda()
-           imgR = torch.FloatTensor(imgR).cuda()     
+           # imgL = torch.FloatTensor(imgL).cuda()
+           # imgR = torch.FloatTensor(imgR).cuda()
+            imgL = torch.cuda.FloatTensor(imgL, requires_grad=False)
+            imgR = torch.cuda.FloatTensor(imgR, requires_grad=False)
+        else:
+            imgL = torch.FloatTensor(imgL, requires_grad=False)
+            imgR = torch.FloatTensor(imgR, requires_grad=False)
 
-        imgL, imgR= Variable(imgL), Variable(imgR)
+        # imgL, imgR= Variable(imgL), Variable(imgR)
 
         with torch.no_grad():
             output = model(imgL,imgR)
