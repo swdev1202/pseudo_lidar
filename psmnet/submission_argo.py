@@ -38,7 +38,7 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--save_path', type=str, default='finetune_1000', metavar='S',
                     help='path to save the predict')
-parser.add_argument('--save_figure', action='store_true', help='if true, save the numpy file, not the png file')
+parser.add_argument('--save_figure', default=False, help='if true, save the png file, not the png file')
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -102,9 +102,9 @@ def main():
        imgL = np.reshape(imgL,[1,3,imgL.shape[1],imgL.shape[2]])
        imgR = np.reshape(imgR,[1,3,imgR.shape[1],imgR.shape[2]])
 
-       # pad to (384, 1248)
-       top_pad = 384-imgL.shape[2]
-       left_pad = 1248-imgL.shape[3]
+       # pad to (2064, 2464) ... Argoverse Original Image Size = (2056,2464)
+       top_pad = 2064-imgL.shape[2]
+       left_pad = 2464-imgL.shape[3]
        imgL = np.lib.pad(imgL,((0,0),(0,0),(top_pad,0),(0,left_pad)),mode='constant',constant_values=0)
        imgR = np.lib.pad(imgR,((0,0),(0,0),(top_pad,0),(0,left_pad)),mode='constant',constant_values=0)
 
@@ -112,8 +112,8 @@ def main():
        pred_disp = test(imgL,imgR)
        print('time = %.2f' %(time.time() - start_time))
 
-       top_pad   = 384-imgL_o.shape[0]
-       left_pad  = 1248-imgL_o.shape[1]
+       top_pad   = 2064-imgL_o.shape[0]
+       left_pad  = 2464-imgL_o.shape[1]
        img = pred_disp[top_pad:,:-left_pad]
        print(test_left_img[inx].split('/')[-1])
        if args.save_figure:
