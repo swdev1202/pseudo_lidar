@@ -19,7 +19,8 @@ import skimage.transform
 import numpy as np
 import time
 import math
-from utils import preprocess 
+from utils import preprocess
+from torchsummary import summary
 from models import *
 
 # 2012 data /media/jiaren/ImageNet/data_scene_flow_2012/testing/
@@ -48,6 +49,9 @@ args.cuda = not args.no_cuda and torch.cuda.is_available()
 # https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
 torch.backends.cudnn.benchmark = True
 
+# https://discuss.pytorch.org/t/how-can-i-crop-half/41767/6
+device = 'cuda' if args.cuda else 'cpu'
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -68,11 +72,12 @@ else:
     print('no model')
 
 model = nn.DataParallel(model, device_ids=[0])
-model.half().cuda()
+model.to(device)
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
     model.load_state_dict(state_dict['state_dict'])
+    model.half()
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
@@ -82,8 +87,8 @@ def test(imgL,imgR):
         if args.cuda:
            # imgL = torch.FloatTensor(imgL).cuda()
            # imgR = torch.FloatTensor(imgR).cuda()
-            imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False).cuda()
-            imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False).cuda()
+            imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False).to(device)
+            imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False).to(device)
         else:
             imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False)
             imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False)
