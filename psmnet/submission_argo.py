@@ -77,7 +77,6 @@ model.to(device)
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
     model.load_state_dict(state_dict['state_dict'])
-    model.half()
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
@@ -102,7 +101,7 @@ def test(imgL,imgR):
 
         with torch.no_grad():
             print('here')
-            output = model(imgL.to(torch.float16),imgR.to(torch.float16))
+            output = model(imgL, imgR)
         output = torch.squeeze(output)
         pred_disp = output.data.cpu().numpy()
 
