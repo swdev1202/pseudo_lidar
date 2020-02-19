@@ -79,8 +79,8 @@ def test(imgL,imgR):
         if args.cuda:
            # imgL = torch.FloatTensor(imgL).cuda()
            # imgR = torch.FloatTensor(imgR).cuda()
-            imgL = torch.cuda.FloatTensor(imgL, requires_grad=False)
-            imgR = torch.cuda.FloatTensor(imgR, requires_grad=False)
+            imgL = torch.FloatTensor(imgL, requires_grad=False).cuda()
+            imgR = torch.FloatTensor(imgR, requires_grad=False).cuda()
         else:
             imgL = torch.FloatTensor(imgL, requires_grad=False)
             imgR = torch.FloatTensor(imgR, requires_grad=False)
