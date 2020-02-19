@@ -79,11 +79,11 @@ def test(imgL,imgR):
         if args.cuda:
            # imgL = torch.FloatTensor(imgL).cuda()
            # imgR = torch.FloatTensor(imgR).cuda()
-            imgL = torch.FloatTensor(imgL, requires_grad=False).cuda()
-            imgR = torch.FloatTensor(imgR, requires_grad=False).cuda()
+            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).cuda()
+            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).cuda()
         else:
-            imgL = torch.FloatTensor(imgL, requires_grad=False)
-            imgR = torch.FloatTensor(imgR, requires_grad=False)
+            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False)
+            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False)
 
         # imgL, imgR= Variable(imgL), Variable(imgR)
 
