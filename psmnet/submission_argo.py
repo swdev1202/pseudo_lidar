@@ -68,7 +68,7 @@ else:
     print('no model')
 
 model = nn.DataParallel(model, device_ids=[0])
-model.cuda().half()
+model.half().cuda()
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
@@ -82,8 +82,8 @@ def test(imgL,imgR):
         if args.cuda:
            # imgL = torch.FloatTensor(imgL).cuda()
            # imgR = torch.FloatTensor(imgR).cuda()
-            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).cuda().half()
-            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).cuda().half()
+            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).half().cuda()
+            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).half().cuda()
         else:
             imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).half()
             imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).half()
