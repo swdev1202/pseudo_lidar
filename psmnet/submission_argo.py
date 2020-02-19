@@ -102,7 +102,7 @@ def test(imgL,imgR):
 
         with torch.no_grad():
             print('here')
-            output = model(imgL,imgR)
+            output = model(imgL.to(torch.float16),imgR.to(torch.float16))
         output = torch.squeeze(output)
         pred_disp = output.data.cpu().numpy()
 
@@ -117,16 +117,16 @@ def main():
 
    for inx in range(len(test_left_img)):
 
-       imgL_o = (skimage.io.imread(test_left_img[inx]).astype('np.float32'))
-       imgR_o = (skimage.io.imread(test_right_img[inx]).astype('np.float32'))
+       imgL_o = (skimage.io.imread(test_left_img[inx]).astype('float32'))
+       imgR_o = (skimage.io.imread(test_right_img[inx]).astype('float32'))
        imgL = processed(imgL_o).numpy()
        imgR = processed(imgR_o).numpy()
-       imgL = np.reshape(imgL,[1,3,imgL.shape[1],imgL.shape[2]])
+       imgL = np.reshape(imgL,[1,3,imgL.shape[1],imgL.shape[2]]) # (batch, color_channel, H, W) = (1,3,2056,2464)
        imgR = np.reshape(imgR,[1,3,imgR.shape[1],imgR.shape[2]])
 
        # pad to (2064, 2464) ... Argoverse Original Image Size = (2056,2464)
-       top_pad = 2064-imgL.shape[2]
-       left_pad = 2464-imgL.shape[3]
+       top_pad = 2064-imgL.shape[2] # 8
+       left_pad = 2464-imgL.shape[3] # 0
        imgL = np.lib.pad(imgL,((0,0),(0,0),(top_pad,0),(0,left_pad)),mode='constant',constant_values=0)
        imgR = np.lib.pad(imgR,((0,0),(0,0),(top_pad,0),(0,left_pad)),mode='constant',constant_values=0)
 
