@@ -6,7 +6,7 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.parallel
-import torch. ckends.cudnn as cudnn
+import torch.backends.cudnn as cudnn
 import torch.optim as optim
 import torch.utils.data
 from torch.autograd import Variable
