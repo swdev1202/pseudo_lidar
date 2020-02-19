@@ -83,19 +83,25 @@ print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in mo
 
 def test(imgL,imgR):
         model.eval()
+        print(model)
 
-        if args.cuda:
-           # imgL = torch.FloatTensor(imgL).cuda()
-           # imgR = torch.FloatTensor(imgR).cuda()
-            imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False).to(device)
-            imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False).to(device)
-        else:
-            imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False)
-            imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False)
+        # if args.cuda:
+        #    # imgL = torch.FloatTensor(imgL).cuda()
+        #    # imgR = torch.FloatTensor(imgR).cuda()
+        #     imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False).to(device)
+        #     imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False).to(device)
+        # else:
+        #     imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False)
+        #     imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False)
 
         # imgL, imgR= Variable(imgL), Variable(imgR)
+        imgL = torch.tensor(imgL, dtype=torch.half, requires_grad=False).to(device)
+        print(imgL)
+        print(type(imgL))
+        imgR = torch.tensor(imgR, dtype=torch.half, requires_grad=False).to(device)
 
         with torch.no_grad():
+            print('here')
             output = model(imgL,imgR)
         output = torch.squeeze(output)
         pred_disp = output.data.cpu().numpy()
