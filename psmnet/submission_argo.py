@@ -45,6 +45,9 @@ parser.add_argument('--save_figure', default=False, help='if true, save the png 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
+# https://discuss.pytorch.org/t/what-does-torch-backends-cudnn-benchmark-do/5936
+torch.backends.cudnn.benchmark = True
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -65,7 +68,7 @@ else:
     print('no model')
 
 model = nn.DataParallel(model, device_ids=[0])
-model.cuda()
+model.cuda().half()
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
@@ -79,11 +82,11 @@ def test(imgL,imgR):
         if args.cuda:
            # imgL = torch.FloatTensor(imgL).cuda()
            # imgR = torch.FloatTensor(imgR).cuda()
-            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).cuda()
-            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).cuda()
+            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).cuda().half()
+            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).cuda().half()
         else:
-            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False)
-            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False)
+            imgL = torch.tensor(imgL, dtype=torch.float, requires_grad=False).half()
+            imgR = torch.tensor(imgR, dtype=torch.float, requires_grad=False).half()
 
         # imgL, imgR= Variable(imgL), Variable(imgR)
 
