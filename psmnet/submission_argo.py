@@ -80,8 +80,6 @@ if args.loadmodel is not None:
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
-summary(model, (3,2064,2464))
-
 def test(imgL,imgR):
         model.eval()
         print(model)
@@ -149,9 +147,3 @@ def main():
 
 if __name__ == '__main__':
    main()
-
-
-
-
-
-
