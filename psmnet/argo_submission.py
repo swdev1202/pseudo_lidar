@@ -81,12 +81,14 @@ if args.loadmodel is not None:
 
     # getting rid of module. in state dict
     substring = 'module.'
-    state_dict_converted = OrderedDict()
+    state_dict_tmp = OrderedDict()
     for k in state_dict['state_dict']:
         new_k = k[len(substring):] if k.startswith(substring) else k
-        state_dict_converted[new_k] = state_dict[k]
+        print('old key = ', k)
+        print('new key = ', new_k)
+        state_dict_tmp[new_k] = state_dict[k]
 
-    model.load_state_dict(state_dict_converted)
+    model.load_state_dict(state_dict_tmp)
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
