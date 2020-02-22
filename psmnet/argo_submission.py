@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.parallel
 from torch.autograd import Variable
 import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
 
 import skimage
 import skimage.io
@@ -63,10 +64,11 @@ else:
 
 model = nn.DataParallel(model, device_ids=[0])
 model.cuda()
+cudnn.benchmark = True
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
-    model.load_state_dict(state_dict['state_dict'])
+    model.module.load_state_dict(state_dict['state_dict'])
 
 if(args.fullsize):
     top_pad_const = 2064
