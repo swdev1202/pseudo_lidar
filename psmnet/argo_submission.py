@@ -42,7 +42,9 @@ parser.add_argument('--save_path', type=str, default='finetune_1000', metavar='S
 parser.add_argument('--save_figure', action='store_true', help='if true, save the png file, not the npy file')
 parser.add_argument('--fullsize', action='store_true', help='if true, use a fullsize image')
 args = parser.parse_args()
+
 args.cuda = not args.no_cuda and torch.cuda.is_available()
+print('CUDA available? ', args.cuda)
 
 torch.manual_seed(args.seed)
 if args.cuda:
@@ -57,18 +59,20 @@ test_left_img, test_right_img = DA.dataloader(args.datapath)
 
 if args.model == 'stackhourglass':
     model = stackhourglass(args.maxdisp)
+    print(args.model, ' model selected')
 elif args.model == 'basic':
     model = basic(args.maxdisp)
 else:
     print('no model')
 
-model = nn.DataParallel(model, device_ids=[0])
+#model = nn.DataParallel(model, device_ids=[0])
+model = nn.DataParallel(model)
 model.cuda()
 cudnn.benchmark = True
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
-    model.module.load_state_dict(state_dict['state_dict'])
+    model.load_state_dict(state_dict['state_dict'])
 
 if(args.fullsize):
     top_pad_const = 2064
