@@ -2,6 +2,7 @@ from __future__ import print_function
 import argparse
 import os
 import random
+from collections import OrderedDict
 
 import torch
 import torch.nn as nn
@@ -77,6 +78,15 @@ cudnn.benchmark = True
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
+
+    # getting rid of module. in state dict
+    substring = 'module.'
+    state_dict_tmp = OrderedDict()
+    for k in state_dict:
+        new_k = k[len(substring):] if k.startswith(substring) else k
+        state_dict_tmp[new_k] = state_dict[k]
+    state_dict = state_dict_tmp
+
     model.load_state_dict(state_dict['state_dict'])
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
