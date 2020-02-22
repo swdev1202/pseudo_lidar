@@ -5,10 +5,9 @@ import random
 
 import torch
 import torch.nn as nn
-import torch.nn.parallel
-from torch.autograd import Variable
 import torch.nn.functional as F
 import torch.backends.cudnn as cudnn
+from torch.autograd import Variable
 
 import skimage
 import skimage.io
@@ -46,6 +45,13 @@ args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 print('CUDA available? ', args.cuda)
 
+if(args.fullsize):
+    top_pad_const = 2064
+    left_pad_const = 2464
+else:
+    top_pad_const = 544
+    left_pad_const = 1248
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -65,21 +71,13 @@ elif args.model == 'basic':
 else:
     print('no model')
 
-#model = nn.DataParallel(model, device_ids=[0])
-model = nn.DataParallel(model)
+model = nn.DataParallel(model, device_ids=[0])
 model.cuda()
 cudnn.benchmark = True
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
     model.load_state_dict(state_dict['state_dict'])
-
-if(args.fullsize):
-    top_pad_const = 2064
-    left_pad_const = 2464
-else:
-    top_pad_const = 544
-    left_pad_const = 1248
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
