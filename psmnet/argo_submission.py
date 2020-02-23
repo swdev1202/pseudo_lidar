@@ -79,21 +79,26 @@ cudnn.benchmark = True
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
 
-    '''
+    tmp_file = open('./' + 'tmp.txt', 'w')
+    
     # getting rid of module. in state dict
     substring = 'module.'
     state_dict_tmp = OrderedDict()
     for k in state_dict['state_dict']:
-        new_k = k[len(substring):] if k.startswith(substring) else k
+        new_k = k[len(substring):] if k.startswith(substring) else k # get rid of the things starting with 'module.'
+        new_k = new_k.replace('.module','') # now, removing anything with '.module' frmo the key
         print('old key = ', k)
         print('new key = ', new_k)
+
+        tmp_file.write(new_k)
+        tmp_file.write('\n')
+
         state_dict_tmp[new_k] = state_dict['state_dict'][k]
+    tmp_file.close()
 
     model.load_state_dict(state_dict_tmp)
-    '''
-    for k in state_dict['state_dict']:
-        print(k)
-    model.load_state_dict(state_dict['state_dict'])
+    
+    # model.load_state_dict(state_dict['state_dict'])
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
