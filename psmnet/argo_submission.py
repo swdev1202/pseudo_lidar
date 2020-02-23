@@ -79,6 +79,7 @@ cudnn.benchmark = True
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
 
+    '''
     # getting rid of module. in state dict
     substring = 'module.'
     state_dict_tmp = OrderedDict()
@@ -89,6 +90,8 @@ if args.loadmodel is not None:
         state_dict_tmp[new_k] = state_dict['state_dict'][k]
 
     model.load_state_dict(state_dict_tmp)
+    '''
+    model.load_state_dict(state_dict['state_dict'])
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
