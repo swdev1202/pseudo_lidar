@@ -86,7 +86,7 @@ if args.loadmodel is not None:
         new_k = k[len(substring):] if k.startswith(substring) else k
         print('old key = ', k)
         print('new key = ', new_k)
-        state_dict_tmp[new_k] = state_dict[k]
+        state_dict_tmp[new_k] = state_dict['state_dict'][k]
 
     model.load_state_dict(state_dict_tmp)
 
