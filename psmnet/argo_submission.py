@@ -91,6 +91,8 @@ if args.loadmodel is not None:
 
     model.load_state_dict(state_dict_tmp)
     '''
+    for k in state_dict['state_dict']:
+        print(k)
     model.load_state_dict(state_dict['state_dict'])
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
