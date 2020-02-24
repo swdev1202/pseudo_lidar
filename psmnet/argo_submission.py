@@ -78,7 +78,7 @@ cudnn.benchmark = True
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
-
+    model.load_state_dict(state_dict['state_dict'])
 '''
     tmp_file = open('./' + 'tmp.txt', 'w')
     
@@ -99,8 +99,6 @@ if args.loadmodel is not None:
 
     model.load_state_dict(state_dict_tmp)
 '''
-    
-    model.load_state_dict(state_dict['state_dict'])
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
