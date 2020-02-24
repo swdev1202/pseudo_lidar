@@ -47,10 +47,14 @@ args.cuda = not args.no_cuda and torch.cuda.is_available()
 print('CUDA available? ', args.cuda)
 
 if(args.fullsize):
-    top_pad_const = 2064
+    top_pad_const = 2080
     left_pad_const = 2464
 else:
-    top_pad_const = 544
+    
+    # top_pad_const = 544
+    # left_pad_const = 1248
+
+    top_pad_const = 352
     left_pad_const = 1248
 
 torch.manual_seed(args.seed)
@@ -79,26 +83,6 @@ cudnn.benchmark = True
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
     model.load_state_dict(state_dict['state_dict'])
-'''
-    tmp_file = open('./' + 'tmp.txt', 'w')
-    
-    # getting rid of module. in state dict
-    substring = 'module.'
-    state_dict_tmp = OrderedDict()
-    for k in state_dict['state_dict']:
-        new_k = k[len(substring):] if k.startswith(substring) else k # get rid of the things starting with 'module.'
-        new_k = new_k.replace('.module','') # now, removing anything with '.module' frmo the key
-        print('old key = ', k)
-        print('new key = ', new_k)
-
-        tmp_file.write(new_k)
-        tmp_file.write('\n')
-
-        state_dict_tmp[new_k] = state_dict['state_dict'][k]
-    tmp_file.close()
-
-    model.load_state_dict(state_dict_tmp)
-'''
 
 print('Number of model parameters: {}'.format(sum([p.data.nelement() for p in model.parameters()])))
 
@@ -131,9 +115,15 @@ def main():
         imgR_o = (skimage.io.imread(test_right_img[inx]).astype('float32'))
 
         if(args.fullsize == False):
+            '''
             # downsample to (H/4 , W/2)
             imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,2,1))
             imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,2,1))
+            '''
+
+            # downsample to (H/6, W/2)
+            imgL_o = skimage.transform.downscale_local_mean(imgL_o, (6,2,1))
+            imgR_o = skimage.transform.downscale_local_mean(imgR_o, (6,2,1))
 
         # process the image
         imgL = processed(imgL_o).numpy()
