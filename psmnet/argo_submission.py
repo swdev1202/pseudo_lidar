@@ -45,17 +45,18 @@ args = parser.parse_args()
 
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 print('CUDA available? ', args.cuda)
+torch.backends.cudnn.benchmark = True
 
 if(args.fullsize):
     top_pad_const = 2080
     left_pad_const = 2464
 else:
     
-    # top_pad_const = 544
-    # left_pad_const = 1248
-
-    top_pad_const = 352
+    top_pad_const = 544
     left_pad_const = 1248
+
+    # top_pad_const = 352
+    # left_pad_const = 1248
 
 torch.manual_seed(args.seed)
 if args.cuda:
@@ -78,7 +79,6 @@ else:
 
 model = nn.DataParallel(model, device_ids=[0])
 model.cuda()
-cudnn.benchmark = True
 
 if args.loadmodel is not None:
     state_dict = torch.load(args.loadmodel)
@@ -115,15 +115,15 @@ def main():
         imgR_o = (skimage.io.imread(test_right_img[inx]).astype('float32'))
 
         if(args.fullsize == False):
-            '''
+            
             # downsample to (H/4 , W/2)
             imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,2,1))
             imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,2,1))
-            '''
+            
 
             # downsample to (H/6, W/2)
-            imgL_o = skimage.transform.downscale_local_mean(imgL_o, (6,2,1))
-            imgR_o = skimage.transform.downscale_local_mean(imgR_o, (6,2,1))
+            # imgL_o = skimage.transform.downscale_local_mean(imgL_o, (6,2,1))
+            # imgR_o = skimage.transform.downscale_local_mean(imgR_o, (6,2,1))
 
         # process the image
         imgL = processed(imgL_o).numpy()
