@@ -58,6 +58,9 @@ else:
     # top_pad_const = 352
     # left_pad_const = 1248
 
+    top_pad_const = 544
+    left_pad_const = 640
+
 torch.manual_seed(args.seed)
 if args.cuda:
     torch.cuda.manual_seed(args.seed)
@@ -117,13 +120,17 @@ def main():
         if(args.fullsize == False):
             
             # downsample to (H/4 , W/2)
-            imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,2,1))
-            imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,2,1))
+            # imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,2,1))
+            # imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,2,1))
             
 
             # downsample to (H/6, W/2)
             # imgL_o = skimage.transform.downscale_local_mean(imgL_o, (6,2,1))
             # imgR_o = skimage.transform.downscale_local_mean(imgR_o, (6,2,1))
+
+            # downsample to (H/4, W/4)
+            imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,4,1))
+            imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,4,1))
 
         # process the image
         imgL = processed(imgL_o).numpy()
