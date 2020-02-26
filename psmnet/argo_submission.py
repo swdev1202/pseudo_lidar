@@ -41,25 +41,28 @@ parser.add_argument('--save_path', type=str, default='finetune_1000', metavar='S
                     help='path to save the predict')
 parser.add_argument('--save_figure', action='store_true', help='if true, save the png file, not the npy file')
 parser.add_argument('--fullsize', action='store_true', help='if true, use a fullsize image')
+parser.add_argument('--scale', type=tuple, default=(1,1))
 args = parser.parse_args()
 
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 print('CUDA available? ', args.cuda)
 torch.backends.cudnn.benchmark = True
 
+# default size
+IMG_HEIGHT = 2056
+IMG_WIDTH = 2464
+
 if(args.fullsize):
     top_pad_const = 2080
     left_pad_const = 2464
 else:
-    
-    top_pad_const = 544
-    left_pad_const = 1248
+    # divide with the scale
+    NEW_IMG_HEIGHT = IMG_HEIGHT//args.scale[0]
+    NEW_IMG_WIDTH = IMG_WIDTH//args.scale[1]
 
-    # top_pad_const = 352
-    # left_pad_const = 1248
-
-    top_pad_const = 544
-    left_pad_const = 640
+    # calculate the padding amount
+    top_pad_const = NEW_IMG_HEIGHT + (32 - (NEW_IMG_HEIGHT%32))
+    left_pad_const = NEW_IMG_WIDTH + (32 - (NEW_IMG_WIDTH%32))
 
 torch.manual_seed(args.seed)
 if args.cuda:
@@ -109,8 +112,11 @@ def test(imgL,imgR):
 
 def main():
     processed = preprocess.get_transform(augment=False)
-    if not os.path.isdir(args.save_path):
-        os.makedirs(args.save_path)
+    
+    if not os.path.exists(args.save_path):
+       os.mkdir(args.save_path)
+       os.mkdir(args.save_path + 'figures')
+       os.mkdir(args.save_path + 'npy')
     
     for inx in range(len(test_left_img)):
         # read left / right images
@@ -118,19 +124,9 @@ def main():
         imgR_o = (skimage.io.imread(test_right_img[inx]).astype('float32'))
 
         if(args.fullsize == False):
-            
-            # downsample to (H/4 , W/2)
-            # imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,2,1))
-            # imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,2,1))
-            
-
-            # downsample to (H/6, W/2)
-            # imgL_o = skimage.transform.downscale_local_mean(imgL_o, (6,2,1))
-            # imgR_o = skimage.transform.downscale_local_mean(imgR_o, (6,2,1))
-
-            # downsample to (H/4, W/4)
-            imgL_o = skimage.transform.downscale_local_mean(imgL_o, (4,4,1))
-            imgR_o = skimage.transform.downscale_local_mean(imgR_o, (4,4,1))
+            # downsample to (H/scale[0] , W/scale[1])
+            imgL_o = skimage.transform.downscale_local_mean(imgL_o, (args.scale[0], args.scale[1], 1))
+            imgR_o = skimage.transform.downscale_local_mean(imgR_o, (args.scale[0], args.scale[1], 1))
 
         # process the image
         imgL = processed(imgL_o).numpy()
@@ -154,7 +150,8 @@ def main():
         img = pred_disp[top_pad:,:-left_pad]
         print(test_left_img[inx].split('/')[-1])
         if args.save_figure:
-            skimage.io.imsave(args.save_path+'/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
+            skimage.io.imsave(args.save_path+'figures/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
+            np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
         else:
             np.save(args.save_path+'/'+test_left_img[inx].split('/')[-1][:-4], img)
 
