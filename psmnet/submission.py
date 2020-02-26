@@ -38,7 +38,7 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
 parser.add_argument('--save_path', type=str, default='finetune_1000', metavar='S',
                     help='path to save the predict')
-parser.add_argument('--save_figure', action='store_true', help='if true, save the numpy file, not the png file')
+parser.add_argument('--save_figure', action='store_true', help='if true, save the png file & npy files, else just npy file')
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 
@@ -89,8 +89,11 @@ def test(imgL,imgR):
 
 def main():
    processed = preprocess.get_transform(augment=False)
-   if not os.path.isdir(args.save_path):
-       os.makedirs(args.save_path)
+   
+   if not os.path.exists(args.save_path):
+       os.mkdir(args.save_path)
+       os.mkdir(args.save_path + 'figures')
+       os.mkdir(args.save_path + 'npy')
 
 
    for inx in range(len(test_left_img)):
@@ -117,9 +120,10 @@ def main():
        img = pred_disp[top_pad:,:-left_pad]
        print(test_left_img[inx].split('/')[-1])
        if args.save_figure:
-           skimage.io.imsave(args.save_path+'/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
+           skimage.io.imsave(args.save_path+'figures/'+test_left_img[inx].split('/')[-1],(img*256).astype('int16'))
+           np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
        else:
-           np.save(args.save_path+'/'+test_left_img[inx].split('/')[-1][:-4], img)
+           np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
 
 if __name__ == '__main__':
    main()

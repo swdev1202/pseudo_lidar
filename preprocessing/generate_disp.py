@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
         if(args.dataset == 'KITTI'):
             baseline = 0.54
-        else:
+        else: # ARGO stereo cam baseline distance
             baseline = 0.2986
             
         disp = generate_dispariy_from_velo(lidar, height, width, calib, baseline)
