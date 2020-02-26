@@ -27,6 +27,8 @@ if __name__ == '__main__':
     parser.add_argument('--data_path', type=str, default='~/Kitti/object/training/')
     parser.add_argument('--split_file', type=str, default='~/Kitti/object/train.txt')
     parser.add_argument('--dataset', type=str, default='KITTI')
+    parser.add_argument('--scale_h', type=int, default=0, help='horizontal scale')
+    parser.add_argument('--scale_v', type=int, default=0, help='vertical scale')
     args = parser.parse_args()
 
     assert os.path.isdir(args.data_path)

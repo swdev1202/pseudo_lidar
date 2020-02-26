@@ -94,6 +94,7 @@ def main():
        os.mkdir(args.save_path)
        os.mkdir(args.save_path + 'figures')
        os.mkdir(args.save_path + 'npy')
+       os.mkdir(args.save_path + 'figures_uint16')
 
 
    for inx in range(len(test_left_img)):
@@ -120,8 +121,8 @@ def main():
        img = pred_disp[top_pad:,:-left_pad]
        print(test_left_img[inx].split('/')[-1])
        if args.save_figure:
-           skimage.io.imsave(args.save_path+'figures/'+test_left_img[inx].split('/')[-1],(img*256).astype('int16'))
-           np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
+           skimage.io.imsave(args.save_path+'figures_uint16/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
+           # np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
        else:
            np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
 
