@@ -41,7 +41,7 @@ parser.add_argument('--save_path', type=str, default='finetune_1000', metavar='S
                     help='path to save the predict')
 parser.add_argument('--save_figure', action='store_true', help='if true, save the png file, not the npy file')
 parser.add_argument('--fullsize', action='store_true', help='if true, use a fullsize image')
-parser.add_argument('--scale', type=tuple, default=(1,1))
+parser.add_argument('--scale', nargs='+', type=int)
 args = parser.parse_args()
 
 args.cuda = not args.no_cuda and torch.cuda.is_available()
