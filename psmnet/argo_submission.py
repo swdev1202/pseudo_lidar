@@ -174,10 +174,10 @@ def main():
             if(args.interpolate):
                 intrp_img = apply_interpolate(img, (args.scale[0], args.scale[1]))
                 skimage.io.imsave(args.save_path+'intp_figures/'+test_left_img[inx].split('/')[-1],(intrp_img*256).astype('uint16'))
-                np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], intrp_img)
+                np.save(args.save_path+'intp_npy/'+test_left_img[inx].split('/')[-1][:-4], intrp_img)
             else:
                 skimage.io.imsave(args.save_path+'figures/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
-                np.save(args.save_path+'intp_npy/'+test_left_img[inx].split('/')[-1][:-4], img)
+                np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
         else:
             np.save(args.save_path+'/'+test_left_img[inx].split('/')[-1][:-4], img)
 
