@@ -111,3 +111,7 @@ KITTI/
 
 # Models
 *.tar
+
+# image and bin files
+*.jpg
+*.bin

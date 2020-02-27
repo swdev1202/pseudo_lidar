@@ -42,6 +42,7 @@ parser.add_argument('--save_path', type=str, default='finetune_1000', metavar='S
 parser.add_argument('--save_figure', action='store_true', help='if true, save the png file, not the npy file')
 parser.add_argument('--fullsize', action='store_true', help='if true, use a fullsize image')
 parser.add_argument('--scale', nargs='+', type=int)
+parser.add_argument('--interpolate', action='store_true')
 args = parser.parse_args()
 
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -110,6 +111,23 @@ def test(imgL,imgR):
             print('I will not work without cuda')
             return None
 
+def apply_interpolate(data_in, sc_factor):
+    '''
+        data_in -> numpy array
+        sc_factor -> tuple where (x,y) scale factor
+    '''
+    data_torch = torch.from_numpy(data_in).float() # (H,W)
+    data_torch.unsqueeze_(0) # (C,H,W)
+    data_torch.unsqueeze_(0) # (B,C,H,W)
+
+    interp_data = F.interpolate(data_torch, scale_factor=sc_factor, mode='nearest')
+    interp_data.squeeze_(0) # (C,H,W)
+    interp_data.squeeze_(0) # (H,W)
+
+    return interp_data.numpy() # returning as a numpy array
+
+
+
 def main():
     processed = preprocess.get_transform(augment=False)
     
@@ -117,6 +135,9 @@ def main():
        os.mkdir(args.save_path)
        os.mkdir(args.save_path + 'figures')
        os.mkdir(args.save_path + 'npy')
+       if(args.interpolate):
+           os.mkdir(args.save_path + 'intp_figures')
+           os.mkdir(args.save_path + 'intp_npy')
     
     for inx in range(len(test_left_img)):
         # read left / right images
@@ -150,16 +171,15 @@ def main():
         img = pred_disp[top_pad:,:-left_pad]
         print(test_left_img[inx].split('/')[-1])
         if args.save_figure:
-            skimage.io.imsave(args.save_path+'figures/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
-            np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], img)
+            if(args.interpolate):
+                intrp_img = apply_interpolate(img, (args.scale[0], args.scale[1]))
+                skimage.io.imsave(args.save_path+'intp_figures/'+test_left_img[inx].split('/')[-1],(intrp_img*256).astype('uint16'))
+                np.save(args.save_path+'npy/'+test_left_img[inx].split('/')[-1][:-4], intrp_img)
+            else:
+                skimage.io.imsave(args.save_path+'figures/'+test_left_img[inx].split('/')[-1],(img*256).astype('uint16'))
+                np.save(args.save_path+'intp_npy/'+test_left_img[inx].split('/')[-1][:-4], img)
         else:
             np.save(args.save_path+'/'+test_left_img[inx].split('/')[-1][:-4], img)
 
 if __name__ == '__main__':
    main()
-
-
-
-
-
-

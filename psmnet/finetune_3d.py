@@ -44,6 +44,7 @@ parser.add_argument('--split_file', default='Kitti/object/train.txt',
 parser.add_argument('--btrain', type=int, default=4)
 parser.add_argument('--start_epoch', type=int, default=1)
 parser.add_argument('--num_worker', type=int, default=14)
+parser.add_argument('--scale', nargs='+', type=int)
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
