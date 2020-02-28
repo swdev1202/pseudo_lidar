@@ -2,6 +2,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 import pyqtgraph.opengl as gl
 import numpy as np
 import argparse
+from datetime import datetime
 
 class plot3d(object):
     def __init__(self, title='null'):
@@ -22,8 +23,10 @@ class plot3d(object):
         hlayout = QtGui.QHBoxLayout()
         snap_btn = QtGui.QPushButton('&Snap')
         def take_snap():
+            curr_time = datetime.now().strftime('%Y%m%d%H%M%S')
+            save_file_str = curr_time + '.jpg'
             qimg = self.glview.readQImage()
-            qimg.save('1.jpg')
+            qimg.save(save_file_str)
         snap_btn.clicked.connect(take_snap)
         hlayout.addWidget(snap_btn)
         hlayout.addStretch()
@@ -66,26 +69,30 @@ def value_to_rgb(pc_inte):
     g = 1 - b - r
     return np.stack([r, g, b]).transpose()
 
-def view_points_cloud(pc=None):
+def view_points_cloud(pc_velo=None, pc_pseudo=None):
     app = QtGui.QApplication([])
     glview = plot3d()
-    if pc is None:
-        pc = np.random.rand(1024, 3)
-    pc_color = np.ones([pc.shape[0], 4])
-    pc_color[:,0] = 0.0
-    print(pc_color)
-    glview.add_points(pc, pc_color)
+
+    pc_velo_color = np.ones([pc_velo.shape[0], 4])
+    pc_velo_color[:,0] = 0.0 # blue
+    glview.add_points(pc_velo, pc_velo_color)
+
+    pc_pseudo_color = np.ones([pc_pseudo.shape[0],4])
+    pc_pseudo_color[:,2] = 0.0 # yellow
+    glview.add_points(pc_pseudo, pc_pseudo_color)
     glview.view.show()
     return app.exec()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Libar')
-    parser.add_argument('--bin_file', type=str, default='~/Kitti/object/training/calib')
+    parser.add_argument('--velo', type=str, default='~/Kitti/object/training/calib')
+    parser.add_argument('--pseudo', type=str)
     args = parser.parse_args()
 
-    lidar_pc = np.fromfile(args.bin_file, dtype=np.float32).reshape((-1, 4))[:, :3]
-    print(lidar_pc)
-    print(lidar_pc.shape)
+    v_pc = np.fromfile(args.velo, dtype=np.float32).reshape((-1, 4))[:, :3]
+    p_pc = np.fromfile(args.pseudo, dtype=np.float32).reshape((-1, 4))[:, :3]
+
+    print(f'v_pc shape = {v_pc.shape} and p_pc shape = {p_pc.shape}')
 
     # time to visualize
-    view_points_cloud(lidar_pc)
+    view_points_cloud(v_pc, p_pc)
