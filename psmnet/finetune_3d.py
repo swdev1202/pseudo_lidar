@@ -45,6 +45,7 @@ parser.add_argument('--btrain', type=int, default=4)
 parser.add_argument('--start_epoch', type=int, default=1)
 parser.add_argument('--num_worker', type=int, default=14)
 parser.add_argument('--scale', nargs='+', type=int)
+parser.add_argument('--disp_fold', type=str, default = 'disparity/')
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -58,7 +59,8 @@ print(os.path.join(args.savemodel, 'training.log'))
 log = logger.setup_logger(os.path.join(args.savemodel, 'training.log'))
 
 all_left_img, all_right_img, all_left_disp, = ls.dataloader(args.datapath,
-                                                            args.split_file)
+                                                            args.split_file,
+                                                            args.disp_fold)
 
 TrainImgLoader = torch.utils.data.DataLoader(
     DA.myImageFloder(all_left_img, all_right_img, all_left_disp, True, scale = args.scale),

@@ -8,10 +8,10 @@ def is_image_file(filename):
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
 
-def dataloader(filepath, train_file):
+def dataloader(filepath, train_file, disp_fold):
     left_fold = 'image_2/'
     right_fold = 'image_3/'
-    disp_L = 'disparity/'
+    disp_L = disp_fold
 
     with open(train_file, 'r') as f:
         train_idx = [x.strip() for x in f.readlines()]
