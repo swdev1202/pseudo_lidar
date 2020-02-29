@@ -20,6 +20,7 @@ def generate_dispariy_from_velo(pc_velo, height, width, calib, cam_baseline):
     baseline = cam_baseline
 
     disp_map = (calib.f_u * baseline) / depth_map
+    print(disp_map.shape)
     return disp_map
 
 if __name__ == '__main__':
@@ -27,15 +28,14 @@ if __name__ == '__main__':
     parser.add_argument('--data_path', type=str, default='~/Kitti/object/training/')
     parser.add_argument('--split_file', type=str, default='~/Kitti/object/train.txt')
     parser.add_argument('--dataset', type=str, default='KITTI')
-    parser.add_argument('--scale_h', type=int, default=0, help='horizontal scale')
-    parser.add_argument('--scale_v', type=int, default=0, help='vertical scale')
+    parser.add_argument('--scale', nargs='+', type=float, default=[1.0,1.0]) # scale (H,W)
     args = parser.parse_args()
 
     assert os.path.isdir(args.data_path)
     lidar_dir = args.data_path + '/velodyne/'
     calib_dir = args.data_path + '/calib/'
     image_dir = args.data_path + '/image_2/'
-    disparity_dir = args.data_path + '/disparity/'
+    disparity_dir = args.data_path + '/disparity' + str(int(args.scale[0]) + str(int(args.sclae[1]))) + '/'
 
     assert os.path.isdir(lidar_dir)
     assert os.path.isdir(calib_dir)
@@ -55,8 +55,13 @@ if __name__ == '__main__':
         predix = fn[:-4]
         if predix not in file_names:
             continue
+        # load calibration info
         calib_file = '{}/{}.txt'.format(calib_dir, predix)
         calib = kitti_util.Calibration(calib_file)
+
+        # scale the calibration
+        calib.scale_P(args.scale[0], args.scale[1])
+
         # load point cloud
         lidar = np.fromfile(lidar_dir + '/' + fn, dtype=np.float32).reshape((-1, 4))[:, :3]
         image_file = '{}/{}.png'.format(image_dir, predix)

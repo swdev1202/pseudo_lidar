@@ -163,6 +163,15 @@ class Calibration(object):
         pts_3d_rect = self.project_image_to_rect(uv_depth)
         return self.project_rect_to_velo(pts_3d_rect)
 
+    def scale_P(self, h, w):
+        scale = np.array([[1/w,0.0,0.0], [0.0,1/h,0.0], [0.0,0.0,1.0]])
+        self.P = np.dot(scale, self.P)
+        self.c_u = self.P[0, 2]
+        self.c_v = self.P[1, 2]
+        self.f_u = self.P[0, 0]
+        self.f_v = self.P[1, 1]
+        self.b_x = self.P[0, 3] / (-self.f_u)  # relative
+        self.b_y = self.P[1, 3] / (-self.f_v)
 
 def inverse_rigid_trans(Tr):
     ''' Inverse a rigid body transform matrix (3x4 as [R|t])
