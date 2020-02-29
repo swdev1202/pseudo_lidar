@@ -5,6 +5,7 @@ import imageio
 import kitti_util
 
 def generate_dispariy_from_velo(pc_velo, height, width, calib, cam_baseline):
+    print(height, width)
     pts_2d = calib.project_velo_to_image(pc_velo)
     fov_inds = (pts_2d[:, 0] < width - 1) & (pts_2d[:, 0] >= 0) & \
                (pts_2d[:, 1] < height - 1) & (pts_2d[:, 1] >= 0)
@@ -67,6 +68,8 @@ if __name__ == '__main__':
         image_file = '{}/{}.png'.format(image_dir, predix)
         image = imageio.imread(image_file)
         height, width = image.shape[:2]
+        height = height//int(args.scale[0])
+        width = width//int(args.scale[1])
 
         if(args.dataset == 'KITTI'):
             baseline = 0.54
