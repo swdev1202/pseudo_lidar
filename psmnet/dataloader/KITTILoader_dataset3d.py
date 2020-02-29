@@ -24,8 +24,6 @@ def default_loader(path, scale):
     if(scale[0] > 1 and scale[1] > 1):
         loaded_image = transforms.Resize((scaled_height,scaled_width),2)(loaded_image)
 
-    print(loaded_image.size)
-
     return loaded_image
 
 
@@ -67,7 +65,6 @@ class myImageFloder(data.Dataset):
 
             processed = preprocess.get_transform(augment=False)
             left_img = processed(left_img)
-            print(left_img.size)
             right_img = processed(right_img)
 
         else:
