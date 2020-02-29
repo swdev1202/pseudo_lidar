@@ -35,7 +35,7 @@ if __name__ == '__main__':
     lidar_dir = args.data_path + '/velodyne/'
     calib_dir = args.data_path + '/calib/'
     image_dir = args.data_path + '/image_2/'
-    disparity_dir = args.data_path + '/disparity' + str(int(args.scale[0]) + str(int(args.scale[1]))) + '/'
+    disparity_dir = args.data_path + '/disparity' + str(int(args.scale[0]) + str(int(args.scale[1])) + '/'
 
     assert os.path.isdir(lidar_dir)
     assert os.path.isdir(calib_dir)
