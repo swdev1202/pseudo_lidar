@@ -1,10 +1,10 @@
 import random
-
 import numpy as np
 import preprocess
 import torch
 import torch.utils.data as data
 from PIL import Image
+from torchvision import transforms
 
 IMG_EXTENSIONS = [
     '.jpg', '.JPG', '.jpeg', '.JPEG',
@@ -16,8 +16,15 @@ def is_image_file(filename):
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
 
-def default_loader(path):
-    return Image.open(path).convert('RGB')
+def default_loader(path, scale):
+    loaded_image = Image.open(path).convert('RGB')
+    original_width, original_height = loaded_image.size
+    scaled_width = original_width//scale[1]
+    scaled_height = original_height//scale[0]
+    if(scale[0] > 1 and scale[1] > 1):
+        loaded_image = transforms.Resize((scaled_height,scaled_width),2)(loaded_image)
+
+    return loaded_image
 
 
 def disparity_loader(path):
@@ -25,7 +32,7 @@ def disparity_loader(path):
 
 
 class myImageFloder(data.Dataset):
-    def __init__(self, left, right, left_disparity, training, loader=default_loader, dploader=disparity_loader):
+    def __init__(self, left, right, left_disparity, training, loader=default_loader, dploader=disparity_loader, scale=[1,1]):
 
         self.left = left
         self.right = right
@@ -33,14 +40,15 @@ class myImageFloder(data.Dataset):
         self.loader = loader
         self.dploader = dploader
         self.training = training
+        self.scale = scale
 
     def __getitem__(self, index):
         left = self.left[index]
         right = self.right[index]
         disp_L = self.disp_L[index]
 
-        left_img = self.loader(left)
-        right_img = self.loader(right)
+        left_img = self.loader(left, self.scale)
+        right_img = self.loader(right, self.scale)
         dataL = self.dploader(disp_L)
 
         if self.training:

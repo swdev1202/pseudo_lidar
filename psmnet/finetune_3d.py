@@ -61,7 +61,7 @@ all_left_img, all_right_img, all_left_disp, = ls.dataloader(args.datapath,
                                                             args.split_file)
 
 TrainImgLoader = torch.utils.data.DataLoader(
-    DA.myImageFloder(all_left_img, all_right_img, all_left_disp, True),
+    DA.myImageFloder(all_left_img, all_right_img, all_left_disp, True, scale = args.scale),
     batch_size=args.btrain, shuffle=True, num_workers=args.num_worker, drop_last=False)
 
 if args.model == 'stackhourglass':
@@ -171,12 +171,6 @@ def main():
             loss = train(imgL_crop, imgR_crop, disp_crop_L)
             print('Iter %d training loss = %.3f , time = %.2f' % (batch_idx, loss, time.time() - start_time))
             total_train_loss += loss
-        print(total_train_loss)
-        print(type(total_train_loss))
-        print(len(TrainImgLoader))
-        print(type(len(TrainImgLoader)))
-        print(total_train_loss / len(TrainImgLoader))
-        print(type(total_train_loss / len(TrainImgLoader)))
 
         log.info('epoch %d total training loss = %.3f' % (epoch, total_train_loss / len(TrainImgLoader)))
         print('epoch %d total training loss = %.3f' % (epoch, total_train_loss / len(TrainImgLoader)))
