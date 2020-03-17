@@ -92,6 +92,7 @@ if __name__ == '__main__':
 
         # concatenate pseudo lidar and original lidar
         combined_lidar = np.vstack((velo,pseudo_lidar))
+        combined_lidar = np.concatenate([combined_lidar, np.ones((combined_lidar.shape[0], 1))], 1)
 
         combined_lidar.tofile('{}/{}.bin'.format(args.save_dir, predix))
         print('Finish Depth {}'.format(predix))
