@@ -33,13 +33,12 @@ def project_depth_to_points(calib, depth, max_high):
     return cloud[valid]
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Generate Libar')
+    parser = argparse.ArgumentParser(description='Generate Lidar from disparity or depth')
     parser.add_argument('--calib_dir', type=str,
                         default='~/Kitti/object/training/calib')
     parser.add_argument('--masked_disparity_dir', type=str,
                         default='~/Kitti/object/training/predicted_disparity')
-    parser.add_argument('--velo_dir', type=str,
-                        defulat='')
+    parser.add_argument('--velo_dir', type=str, defulat='~/Kitti')
     parser.add_argument('--save_dir', type=str,
                         default='~/Kitti/object/training/predicted_velodyne')
     parser.add_argument('--max_high', type=int, default=1)
