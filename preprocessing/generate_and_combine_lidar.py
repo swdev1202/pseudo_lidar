@@ -88,7 +88,7 @@ if __name__ == '__main__':
         
         # pad 1 in the indensity dimension
         # pseudo_lidar = np.concatenate([pseudo_lidar, np.ones((pseudo_lidar.shape[0], 1))], 1)
-        pseudo_lidar = pseudo_lidar.astype(np.float32)
+        # pseudo_lidar = pseudo_lidar.astype(np.float32)
 
         # concatenate pseudo lidar and original lidar
         combined_lidar = np.vstack((velo,pseudo_lidar))
