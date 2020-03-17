@@ -54,7 +54,7 @@ if __name__ == '__main__':
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
 
-    disps = [x for x in os.listdir(args.disparity_dir) if x[-3:] == 'png' or x[-3:] == 'npy']
+    disps = [x for x in os.listdir(args.masked_disparity_dir) if x[-3:] == 'png' or x[-3:] == 'npy']
     disps = sorted(disps)
 
     for fn in disps:
@@ -67,9 +67,9 @@ if __name__ == '__main__':
         velo = np.fromfile(velo_file, dtype=np.float32).reshape((-1,4))[:, :3]
 
         if fn[-3:] == 'png':
-            disp_map = ssc.imread(args.disparity_dir + '/' + fn)
+            disp_map = ssc.imread(args.masked_disparity_dir + '/' + fn)
         elif fn[-3:] == 'npy':
-            disp_map = np.load(args.disparity_dir + '/' + fn)
+            disp_map = np.load(args.masked_disparity_dir + '/' + fn)
             print(disp_map.shape)
         else:
             assert False
