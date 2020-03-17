@@ -36,19 +36,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Generate Libar')
     parser.add_argument('--calib_dir', type=str,
                         default='~/Kitti/object/training/calib')
-    parser.add_argument('--disparity_dir', type=str,
+    parser.add_argument('--masked_disparity_dir', type=str,
                         default='~/Kitti/object/training/predicted_disparity')
+    parser.add_argument('--velo_dir', type=str,
+                        defulat='')
     parser.add_argument('--save_dir', type=str,
                         default='~/Kitti/object/training/predicted_velodyne')
     parser.add_argument('--max_high', type=int, default=1)
     parser.add_argument('--is_depth', action='store_true')
     parser.add_argument('--datatype', type=str, default='KITTI')
-    parser.add_argument('--debug', type=bool, default=False)
 
     args = parser.parse_args()
 
-    assert os.path.isdir(args.disparity_dir)
+    assert os.path.isdir(args.masked_disparity_dir)
     assert os.path.isdir(args.calib_dir)
+    assert os.path.isdir(args.velo_dir)
 
     if not os.path.isdir(args.save_dir):
         os.makedirs(args.save_dir)
@@ -56,13 +58,14 @@ if __name__ == '__main__':
     disps = [x for x in os.listdir(args.disparity_dir) if x[-3:] == 'png' or x[-3:] == 'npy']
     disps = sorted(disps)
 
-    if(args.debug):
-        print('is it depth? ', args.is_depth)
-
     for fn in disps:
         predix = fn[:-4]
         calib_file = '{}/{}.txt'.format(args.calib_dir, predix)
         calib = kitti_util.Calibration(calib_file)
+
+        # original point cloud
+        velo_file = '{}/{}.bin'.format(args.velo_dir, predix)
+        velo = np.fromfile(velo_file, dtype=np.float32).reshape((-1,4))[:, :3]
 
         if fn[-3:] == 'png':
             disp_map = ssc.imread(args.disparity_dir + '/' + fn)
@@ -79,12 +82,17 @@ if __name__ == '__main__':
 
         if not args.is_depth:
             disp_map = (disp_map*256).astype(np.uint16)/256.
-            lidar = project_disp_to_points(calib, disp_map, args.max_high, base)
+            pseudo_lidar = project_disp_to_points(calib, disp_map, args.max_high, base)
         else:
             disp_map = (disp_map).astype(np.float32)/256.
-            lidar = project_depth_to_points(calib, disp_map, args.max_high)
+            pseudo_lidar = project_depth_to_points(calib, disp_map, args.max_high)
+        
         # pad 1 in the indensity dimension
-        lidar = np.concatenate([lidar, np.ones((lidar.shape[0], 1))], 1)
-        lidar = lidar.astype(np.float32)
-        lidar.tofile('{}/{}.bin'.format(args.save_dir, predix))
+        # pseudo_lidar = np.concatenate([pseudo_lidar, np.ones((pseudo_lidar.shape[0], 1))], 1)
+        pseudo_lidar = pseudo_lidar.astype(np.float32)
+
+        # concatenate pseudo lidar and original lidar
+        combined_lidar = np.vstack((velo,pseudo_lidar))
+
+        combined_lidar.tofile('{}/{}.bin'.format(args.save_dir, predix))
         print('Finish Depth {}'.format(predix))
