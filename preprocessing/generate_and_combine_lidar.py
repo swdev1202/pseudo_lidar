@@ -44,6 +44,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_high', type=int, default=1)
     parser.add_argument('--is_depth', action='store_true')
     parser.add_argument('--datatype', type=str, default='KITTI')
+    parser.add_argument('--random_select', type=int, default = 1)
 
     args = parser.parse_args()
 
@@ -89,6 +90,11 @@ if __name__ == '__main__':
         # pad 1 in the indensity dimension
         # pseudo_lidar = np.concatenate([pseudo_lidar, np.ones((pseudo_lidar.shape[0], 1))], 1)
         # pseudo_lidar = pseudo_lidar.astype(np.float32)
+
+        # random sampling
+        if(args.random_select > 1):
+            pseudo_size = pseudo_lidar.shape[0]
+            pseudo_lidar = pseudo_lidar[np.random.choice(pseudo_size, (pseudo_size//args.random_select), replace=False), :]
 
         # concatenate pseudo lidar and original lidar
         combined_lidar = np.vstack((velo,pseudo_lidar))
