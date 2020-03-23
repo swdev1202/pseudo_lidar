@@ -32,7 +32,7 @@ if __name__ == '__main__':
         velo_file = '{}/{}.bin'.format(args.velo_dir, predix)
         velo = np.fromfile(velo_file, dtype=np.float32).reshape((-1,4))[:, :3]
 
-        psuedo_file = '{}/{}.bin'.format(args.psuedo_dir, predix)
+        psuedo_file = '{}/{}.bin'.format(args.pseudo_dir, predix)
         psuedo = np.fromfile(psuedo_file, dtype=np.float32).reshape((-1,4))[:, :3]
 
 
