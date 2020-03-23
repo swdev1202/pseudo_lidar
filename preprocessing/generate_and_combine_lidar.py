@@ -81,7 +81,6 @@ if __name__ == '__main__':
             base = 0.2986
 
         if not args.is_depth:
-            disp_map = (disp_map*256).astype(np.uint16)/256.
             pseudo_lidar = project_disp_to_points(calib, disp_map, args.max_high, base)
         else:
             disp_map = (disp_map).astype(np.float32)/256.
